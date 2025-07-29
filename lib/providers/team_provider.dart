@@ -161,4 +161,14 @@ class TeamProvider with ChangeNotifier {
     disconnectFromTeamChannel();
     super.dispose();
   }
+  Future<void> inviteUserToTeam(int teamId, String email) async {
+    if (_authToken == null) return;
+    try {
+      await _apiService.inviteUserToTeam(_authToken!, teamId, email);
+    } catch (error) {
+      // Lemparkan lagi error agar UI bisa menangkap dan menampilkannya
+      rethrow;
+    }
+  }
+
 }

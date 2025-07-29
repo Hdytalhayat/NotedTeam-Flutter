@@ -52,6 +52,14 @@ class _TodoScreenState extends State<TodoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.teamName),
+        actions: [ // Tambahkan actions
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            onPressed: () => _showInviteDialog(context, widget.teamId),
+            tooltip: 'Invite User',
+          ),
+        ],
+
       ),
       body: isLoading && todos.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -156,5 +164,66 @@ class _TodoScreenState extends State<TodoScreen> {
       ),
     );
   }
+  void _showInviteDialog(BuildContext context, int teamId) {
+    final emailController = TextEditingController();
+    final teamProvider = Provider.of<TeamProvider>(context, listen: false);
 
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Invite User to Team'),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(labelText: 'User Email'),
+          keyboardType: TextInputType.emailAddress,
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ElevatedButton(
+            child: const Text('Invite'),
+            onPressed: () async {
+              if (emailController.text.isEmpty) return;
+
+              // Tutup dialog
+              Navigator.of(ctx).pop();
+
+              try {
+                // Tampilkan snackbar loading
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Mengundang pengguna...')),
+                );
+
+                await teamProvider.inviteUserToTeam(
+                  teamId,
+                  emailController.text,
+                );
+                
+                // Hapus snackbar loading dan tampilkan snackbar sukses
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Pengguna berhasil diundang!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+
+              } catch (error) {
+                // Hapus snackbar loading dan tampilkan snackbar error
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(error.toString()),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

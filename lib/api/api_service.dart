@@ -111,4 +111,22 @@ class ApiService {
       throw Exception('Gagal menghapus to-do');
     }
   }
+
+  Future<void> inviteUserToTeam(String token, int teamId, String email) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId/invite');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'email': email}),
+    );
+
+    if (response.statusCode != 200) {
+      // Ambil pesan error spesifik dari backend
+      final errorData = json.decode(response.body);
+      throw Exception('Gagal mengundang pengguna: ${errorData['error']}');
+    }
+  }
 }
