@@ -1,6 +1,9 @@
 // lib/providers/team_provider.dart
+import 'dart:async'; // Impor async
+import 'dart:convert'; // Impor convert
 import 'package:flutter/material.dart';
 import '../api/api_service.dart';
+import '../api/websocket_service.dart';
 import '../models/team.dart';
 import '../models/todo.dart';
 
@@ -11,6 +14,9 @@ class TeamProvider with ChangeNotifier {
   // ...
 
   final ApiService _apiService = ApiService();
+  final WebSocketService _webSocketService = WebSocketService(); // Instance service
+  StreamSubscription? _socketSubscription; // Untuk mengelola listener
+  
   String? _authToken;
 
   List<Team> _teams = [];
@@ -24,6 +30,47 @@ class TeamProvider with ChangeNotifier {
   // Metode untuk menerima token dari AuthProvider
   void updateAuthToken(String? token) {
     _authToken = token;
+  }
+  void connectToTeamChannel(int teamId) {
+    if (_authToken == null) return;
+    _webSocketService.connect(teamId, _authToken!);
+
+    // Batalkan listener lama jika ada
+    _socketSubscription?.cancel();
+    
+    // Mulai mendengarkan pesan baru dari WebSocket
+    _socketSubscription = _webSocketService.messages.listen((message) {
+      _handleSocketMessage(message);
+    });
+  }
+  void disconnectFromTeamChannel() {
+    _webSocketService.disconnect();
+    _socketSubscription?.cancel();
+  }
+  void _handleSocketMessage(String message) {
+    final decodedMessage = json.decode(message);
+    final event = decodedMessage['event'];
+    final data = decodedMessage['data'];
+
+    switch (event) {
+      case 'todo_created':
+        final newTodo = Todo.fromJson(data);
+        _currentTodos.insert(0, newTodo);
+        break;
+      case 'todo_updated':
+        final updatedTodo = Todo.fromJson(data);
+        final index = _currentTodos.indexWhere((t) => t.id == updatedTodo.id);
+        if (index != -1) {
+          _currentTodos[index] = updatedTodo;
+        }
+        break;
+      case 'todo_deleted':
+        final int todoId = data['id'];
+        _currentTodos.removeWhere((t) => t.id == todoId);
+        break;
+    }
+    // Beri tahu UI untuk membangun ulang!
+    notifyListeners();
   }
 
   Future<void> fetchAndSetTeams() async {
@@ -79,12 +126,12 @@ class TeamProvider with ChangeNotifier {
   Future<void> createTodo(int teamId, String title, String description) async {
     if (_authToken == null) return;
     try {
-      final newTodo = await _apiService.createTodo(_authToken!, teamId, title, description);
-      _currentTodos.insert(0, newTodo); // Tambahkan di awal list
-      notifyListeners();
+      // Cukup panggil API. Jangan lakukan apa pun setelahnya.
+      // WebSocket akan menangani pembaruan UI.
+      await _apiService.createTodo(_authToken!, teamId, title, description);
     } catch (error) {
       print(error);
-      rethrow;
+      rethrow; // Tetap lemparkan error untuk kemungkinan penanganan di UI
     }
   }
 
@@ -92,45 +139,26 @@ class TeamProvider with ChangeNotifier {
     if (_authToken == null) return;
     try {
       await _apiService.updateTodoStatus(_authToken!, teamId, todoId, newStatus);
-      // Perbarui state lokal
-      final todoIndex = _currentTodos.indexWhere((todo) => todo.id == todoId);
-      if (todoIndex >= 0) {
-        // Buat objek baru agar listener tahu ada perubahan
-        final oldTodo = _currentTodos[todoIndex];
-        _currentTodos[todoIndex] = Todo(
-          id: oldTodo.id,
-          title: oldTodo.title,
-          description: oldTodo.description,
-          status: newStatus, // Status baru
-          urgency: oldTodo.urgency,
-          teamId: oldTodo.teamId,
-        );
-        notifyListeners();
-      }
     } catch (error) {
       print(error);
       rethrow;
     }
   }
+
 
   Future<void> deleteTodo(int teamId, int todoId) async {
     if (_authToken == null) return;
-    
-    // Hapus dari UI terlebih dahulu untuk respons yang cepat (Optimistic Deleting)
-    final existingTodoIndex = _currentTodos.indexWhere((todo) => todo.id == todoId);
-    var existingTodo = _currentTodos[existingTodoIndex];
-    _currentTodos.removeAt(existingTodoIndex);
-    notifyListeners();
-
     try {
       await _apiService.deleteTodo(_authToken!, teamId, todoId);
     } catch (error) {
-      // Jika gagal, kembalikan item yang dihapus ke UI
-      _currentTodos.insert(existingTodoIndex, existingTodo);
-      notifyListeners();
       print(error);
       rethrow;
     }
   }
-
+  // Penting: Pastikan provider di-dispose dengan benar
+  @override
+  void dispose() {
+    disconnectFromTeamChannel();
+    super.dispose();
+  }
 }

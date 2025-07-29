@@ -22,10 +22,24 @@ class _TodoScreenState extends State<TodoScreen> {
   @override
   void initState() {
     super.initState();
+    final teamProvider = Provider.of<TeamProvider>(context, listen: false);
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TeamProvider>(context, listen: false)
-          .fetchAndSetTodos(widget.teamId);
+      // 1. Ambil data awal melalui HTTP
+      teamProvider.fetchAndSetTodos(widget.teamId);
+      
+      // 2. Buka koneksi WebSocket untuk real-time update
+      teamProvider.connectToTeamChannel(widget.teamId);
     });
+  }
+  @override
+  void dispose() {
+    // 3. Putuskan koneksi WebSocket saat layar ditutup
+    // Ini sangat penting untuk mencegah memory leak!
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       Provider.of<TeamProvider>(context, listen: false).disconnectFromTeamChannel();
+    });
+    super.dispose();
   }
 
   @override
