@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Consumer<TeamProvider>(
+        
         builder: (ctx, teamProvider, child) {
           if (teamProvider.isLoading && teamProvider.teams.isEmpty) {
             return const Center(child: CircularProgressIndicator());
@@ -66,6 +67,41 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCreateTeamDialog(context),
+        child: const Icon(Icons.add),
+        tooltip: 'Create Team',
+      ),
+
+    );
+  }
+  void _showCreateTeamDialog(BuildContext context) {
+    final teamNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Create New Team'),
+        content: TextField(
+          controller: teamNameController,
+          decoration: const InputDecoration(labelText: 'Team Name'),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ElevatedButton(
+            child: const Text('Create'),
+            onPressed: () {
+              if (teamNameController.text.isNotEmpty) {
+                Provider.of<TeamProvider>(context, listen: false)
+                    .createTeam(teamNameController.text);
+                Navigator.of(ctx).pop();
+              }
+            },
+          ),
+        ],
       ),
     );
   }

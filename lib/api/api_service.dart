@@ -42,4 +42,73 @@ class ApiService {
       throw Exception('Gagal mengambil data to-do');
     }
   }
+  Future<Team> createTeam(String token, String name) async {
+    final url = Uri.parse('$_baseUrl/api/teams');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'name': name}),
+    );
+
+    if (response.statusCode == 201) {
+      return Team.fromJson(json.decode(response.body)['data']);
+    } else {
+      throw Exception('Gagal membuat tim');
+    }
+  }
+
+  Future<Todo> createTodo(String token, int teamId, String title, String description) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({
+        'title': title,
+        'description': description,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return Todo.fromJson(json.decode(response.body)['data']);
+    } else {
+      throw Exception('Gagal membuat to-do');
+    }
+  }
+
+  Future<void> updateTodoStatus(String token, int teamId, int todoId, String newStatus) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos/$todoId');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'status': newStatus}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal memperbarui status to-do');
+    }
+  }
+
+  Future<void> deleteTodo(String token, int teamId, int todoId) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos/$todoId');
+    final response = await http.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal menghapus to-do');
+    }
+  }
 }

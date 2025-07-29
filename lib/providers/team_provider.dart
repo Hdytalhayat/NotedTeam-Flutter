@@ -64,4 +64,73 @@ class TeamProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+  Future<void> createTeam(String name) async {
+    if (_authToken == null) return;
+    try {
+      final newTeam = await _apiService.createTeam(_authToken!, name);
+      _teams.add(newTeam);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      rethrow;
+    }
+  }
+
+  Future<void> createTodo(int teamId, String title, String description) async {
+    if (_authToken == null) return;
+    try {
+      final newTodo = await _apiService.createTodo(_authToken!, teamId, title, description);
+      _currentTodos.insert(0, newTodo); // Tambahkan di awal list
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      rethrow;
+    }
+  }
+
+  Future<void> updateTodoStatus(int teamId, int todoId, String newStatus) async {
+    if (_authToken == null) return;
+    try {
+      await _apiService.updateTodoStatus(_authToken!, teamId, todoId, newStatus);
+      // Perbarui state lokal
+      final todoIndex = _currentTodos.indexWhere((todo) => todo.id == todoId);
+      if (todoIndex >= 0) {
+        // Buat objek baru agar listener tahu ada perubahan
+        final oldTodo = _currentTodos[todoIndex];
+        _currentTodos[todoIndex] = Todo(
+          id: oldTodo.id,
+          title: oldTodo.title,
+          description: oldTodo.description,
+          status: newStatus, // Status baru
+          urgency: oldTodo.urgency,
+          teamId: oldTodo.teamId,
+        );
+        notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      rethrow;
+    }
+  }
+
+  Future<void> deleteTodo(int teamId, int todoId) async {
+    if (_authToken == null) return;
+    
+    // Hapus dari UI terlebih dahulu untuk respons yang cepat (Optimistic Deleting)
+    final existingTodoIndex = _currentTodos.indexWhere((todo) => todo.id == todoId);
+    var existingTodo = _currentTodos[existingTodoIndex];
+    _currentTodos.removeAt(existingTodoIndex);
+    notifyListeners();
+
+    try {
+      await _apiService.deleteTodo(_authToken!, teamId, todoId);
+    } catch (error) {
+      // Jika gagal, kembalikan item yang dihapus ke UI
+      _currentTodos.insert(existingTodoIndex, existingTodo);
+      notifyListeners();
+      print(error);
+      rethrow;
+    }
+  }
+
 }
