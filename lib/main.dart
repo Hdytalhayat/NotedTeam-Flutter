@@ -1,7 +1,8 @@
-// lib/main.dart (VERSI DIPERBAIKI)
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/team_provider.dart'; // Impor provider baru
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
@@ -15,16 +16,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Sediakan AuthProvider ke seluruh aplikasi
-    return ChangeNotifierProvider(
-      create: (ctx) => AuthProvider(),
+    return MultiProvider( // Gunakan MultiProvider
+      providers: [
+        ChangeNotifierProvider(create: (ctx) => AuthProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, TeamProvider>(
+          create: (ctx) => TeamProvider(),
+          update: (ctx, auth, previousTeamProvider) {
+            // Setiap kali AuthProvider berubah, update token di TeamProvider
+            previousTeamProvider?.updateAuthToken(auth.token);
+            return previousTeamProvider!;
+          },
+        ),
+      ],
       child: MaterialApp(
         title: 'NotedTeam',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        // 2. Home sekarang adalah AuthWrapper yang akan memilih layar
         home: const AuthWrapper(),
       ),
     );
