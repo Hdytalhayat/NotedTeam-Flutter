@@ -60,7 +60,7 @@ class ApiService {
     }
   }
 
-  Future<Todo> createTodo(String token, int teamId, String title, String description) async {
+  Future<Todo> createTodo(String token, int teamId, String title, String description, String urgency) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos');
     final response = await http.post(
       url,
@@ -71,6 +71,7 @@ class ApiService {
       body: json.encode({
         'title': title,
         'description': description,
+        'urgency': urgency,
       }),
     );
 
@@ -81,15 +82,18 @@ class ApiService {
     }
   }
 
-  Future<void> updateTodoStatus(String token, int teamId, int todoId, String newStatus) async {
+  Future<void> updateTodoStatus(String token, int teamId, int todoId, {String? newStatus, String? newUrgency}) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos/$todoId');
+    Map<String, String> body = {};
+    if (newStatus != null) body['status'] = newStatus;
+    if (newUrgency != null) body['urgency'] = newUrgency;
     final response = await http.put(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: json.encode({'status': newStatus}),
+      body: json.encode(body),
     );
 
     if (response.statusCode != 200) {

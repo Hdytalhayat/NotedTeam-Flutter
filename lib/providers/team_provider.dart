@@ -123,27 +123,21 @@ class TeamProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createTodo(int teamId, String title, String description) async {
+  Future<void> createTodo(int teamId, String title, String description, String urgency) async {
     if (_authToken == null) return;
     try {
-      // Cukup panggil API. Jangan lakukan apa pun setelahnya.
-      // WebSocket akan menangani pembaruan UI.
-      await _apiService.createTodo(_authToken!, teamId, title, description);
-    } catch (error) {
-      print(error);
-      rethrow; // Tetap lemparkan error untuk kemungkinan penanganan di UI
-    }
+      await _apiService.createTodo(_authToken!, teamId, title, description, urgency);
+    } catch (error) { rethrow; }
   }
 
-  Future<void> updateTodoStatus(int teamId, int todoId, String newStatus) async {
+
+  Future<void> updateTodo(int teamId, int todoId, {String? newStatus, String? newUrgency}) async {
     if (_authToken == null) return;
     try {
-      await _apiService.updateTodoStatus(_authToken!, teamId, todoId, newStatus);
-    } catch (error) {
-      print(error);
-      rethrow;
-    }
+      await _apiService.updateTodoStatus(_authToken!, teamId, todoId, newStatus: newStatus, newUrgency: newUrgency);
+    } catch (error) { rethrow; }
   }
+
 
 
   Future<void> deleteTodo(int teamId, int todoId) async {

@@ -88,6 +88,7 @@ class _TodoScreenState extends State<TodoScreen> {
                     child: Card(
                       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
                       child: ListTile(
+                        leading: _getUrgencyIcon(todo.urgency),
                         title: Text(todo.title),
                         subtitle: Text(todo.description),
                         trailing: Chip(
@@ -95,9 +96,9 @@ class _TodoScreenState extends State<TodoScreen> {
                             todo.status,
                             style: const TextStyle(color: Colors.white),
                           ),
-                          backgroundColor: todo.status == 'completed' ? Colors.green : Colors.orange,
+                          backgroundColor: _getStatusColor(todo.status),
                         ),
-                        onTap: () => _showUpdateStatusDialog(context, todo),
+                        onTap: () => _showEditTodoDialog(context, todo),
                       ),
                     ),
                   );
@@ -115,61 +116,121 @@ class _TodoScreenState extends State<TodoScreen> {
   void _showCreateTodoDialog(BuildContext context) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
+    String selectedUrgency = 'low'; // Default urgency
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('New To-do'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Title')),
-            TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description')),
-          ],
-        ),
-        actions: [
-          TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
-          ElevatedButton(
-            child: const Text('Add'),
-            onPressed: () {
-              if (titleController.text.isNotEmpty) {
-                Provider.of<TeamProvider>(context, listen: false).createTodo(
-                  widget.teamId,
-                  titleController.text,
-                  descriptionController.text,
-                );
-                Navigator.of(ctx).pop();
-              }
-            },
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        // Bungkus dengan StatefulBuilder agar dropdown bisa di-update
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('New To-do'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Title')),
+                  TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description')),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    value: selectedUrgency,
+                    decoration: const InputDecoration(labelText: 'Urgency'),
+                    items: ['low', 'medium', 'high'].map((urgency) {
+                      return DropdownMenuItem(
+                        value: urgency,
+                        child: Text(urgency.toUpperCase()),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() { // Update state di dalam dialog
+                          selectedUrgency = value;
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
+                ElevatedButton(
+                  child: const Text('Add'),
+                  onPressed: () {
+                    if (titleController.text.isNotEmpty) {
+                      Provider.of<TeamProvider>(context, listen: false).createTodo(
+                        widget.teamId,
+                        titleController.text,
+                        descriptionController.text,
+                        selectedUrgency, // Kirim urgensi yang dipilih
+                      );
+                      Navigator.of(ctx).pop();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
+
   // Tambahkan metode ini juga
-  void _showUpdateStatusDialog(BuildContext context, Todo todo) {
+  void _showEditTodoDialog(BuildContext context, Todo todo) {
+    String selectedStatus = todo.status;
+    String selectedUrgency = todo.urgency;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Update Status'),
-        content: const Text('Tandai to-do ini sebagai selesai?'),
-        actions: [
-          TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
-          ElevatedButton(
-            child: const Text('Mark as Completed'),
-            onPressed: () {
-              Provider.of<TeamProvider>(context, listen: false).updateTodoStatus(
-                widget.teamId,
-                todo.id,
-                'completed',
-              );
-              Navigator.of(ctx).pop();
-            },
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit To-do'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: selectedStatus,
+                    decoration: const InputDecoration(labelText: 'Status'),
+                    items: ['pending', 'working', 'completed'].map((status) {
+                      return DropdownMenuItem(value: status, child: Text(status));
+                    }).toList(),
+                    onChanged: (value) => setState(() => selectedStatus = value!),
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: selectedUrgency,
+                    decoration: const InputDecoration(labelText: 'Urgency'),
+                    items: ['low', 'medium', 'high'].map((urgency) {
+                      return DropdownMenuItem(value: urgency, child: Text(urgency.toUpperCase()));
+                    }).toList(),
+                    onChanged: (value) => setState(() => selectedUrgency = value!),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
+                ElevatedButton(
+                  child: const Text('Save Changes'),
+                  onPressed: () {
+                    Provider.of<TeamProvider>(context, listen: false).updateTodo(
+                      widget.teamId,
+                      todo.id,
+                      newStatus: selectedStatus,
+                      newUrgency: selectedUrgency,
+                    );
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
+
   void _showInviteDialog(BuildContext context, int teamId) {
     final emailController = TextEditingController();
     final teamProvider = Provider.of<TeamProvider>(context, listen: false);
@@ -232,4 +293,27 @@ class _TodoScreenState extends State<TodoScreen> {
       ),
     );
   }
+  Icon _getUrgencyIcon(String urgency) {
+    switch (urgency) {
+      case 'high':
+        return const Icon(Icons.arrow_upward, color: Colors.red);
+      case 'medium':
+        return const Icon(Icons.remove, color: Colors.orange);
+      case 'low':
+      default:
+        return const Icon(Icons.arrow_downward, color: Colors.green);
+    }
+  }
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'completed':
+        return Colors.green;
+      case 'working':
+        return Colors.orange;
+      case 'pending':
+      default:
+        return Colors.grey;
+    }
+  }
+
 }
