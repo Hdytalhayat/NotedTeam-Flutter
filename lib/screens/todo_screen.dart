@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/todo.dart';
 import '../providers/team_provider.dart';
+import 'package:intl/intl.dart';
 
 class TodoScreen extends StatefulWidget {
   final int teamId;
@@ -90,7 +91,26 @@ class _TodoScreenState extends State<TodoScreen> {
                       child: ListTile(
                         leading: _getUrgencyIcon(todo.urgency),
                         title: Text(todo.title),
-                        subtitle: Text(todo.description),
+                        subtitle: Column( // Bungkus dengan Column
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(todo.description),
+                            if (todo.dueDate != null) // Tampilkan hanya jika ada
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  'Due: ${DateFormat.yMMMd().format(todo.dueDate!)}', // Format tanggal
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: todo.dueDate!.isBefore(DateTime.now()) && todo.status != 'completed' 
+                                        ? Colors.red 
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+
                         trailing: Chip(
                           label: Text(
                             todo.status,
@@ -117,7 +137,7 @@ class _TodoScreenState extends State<TodoScreen> {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
     String selectedUrgency = 'low'; // Default urgency
-
+    DateTime? selectedDate;
     showDialog(
       context: context,
       builder: (ctx) {
@@ -132,6 +152,25 @@ class _TodoScreenState extends State<TodoScreen> {
                   TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Title')),
                   TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description')),
                   const SizedBox(height: 10),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: Text(selectedDate == null
+                        ? 'No Due Date'
+                        : 'Due: ${DateFormat.yMMMd().format(selectedDate!)}'),
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          selectedDate = pickedDate;
+                        });
+                      }
+                    },
+                  ),
                   DropdownButtonFormField<String>(
                     value: selectedUrgency,
                     decoration: const InputDecoration(labelText: 'Urgency'),
@@ -161,11 +200,13 @@ class _TodoScreenState extends State<TodoScreen> {
                         widget.teamId,
                         titleController.text,
                         descriptionController.text,
-                        selectedUrgency, // Kirim urgensi yang dipilih
+                        selectedUrgency,
+                        selectedDate, // Kirim DateTime?
                       );
                       Navigator.of(ctx).pop();
                     }
                   },
+
                 ),
               ],
             );
@@ -180,6 +221,7 @@ class _TodoScreenState extends State<TodoScreen> {
   void _showEditTodoDialog(BuildContext context, Todo todo) {
     String selectedStatus = todo.status;
     String selectedUrgency = todo.urgency;
+    DateTime? selectedDate = todo.dueDate;
 
     showDialog(
       context: context,
@@ -188,37 +230,69 @@ class _TodoScreenState extends State<TodoScreen> {
           builder: (context, setState) {
             return AlertDialog(
               title: const Text('Edit To-do'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<String>(
-                    value: selectedStatus,
-                    decoration: const InputDecoration(labelText: 'Status'),
-                    items: ['pending', 'working', 'completed'].map((status) {
-                      return DropdownMenuItem(value: status, child: Text(status));
-                    }).toList(),
-                    onChanged: (value) => setState(() => selectedStatus = value!),
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: selectedUrgency,
-                    decoration: const InputDecoration(labelText: 'Urgency'),
-                    items: ['low', 'medium', 'high'].map((urgency) {
-                      return DropdownMenuItem(value: urgency, child: Text(urgency.toUpperCase()));
-                    }).toList(),
-                    onChanged: (value) => setState(() => selectedUrgency = value!),
-                  ),
-                ],
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      value: selectedStatus,
+                      decoration: const InputDecoration(labelText: 'Status'),
+                      items: ['pending', 'working', 'completed'].map((status) {
+                        return DropdownMenuItem(value: status, child: Text(status));
+                      }).toList(),
+                      onChanged: (value) => setState(() => selectedStatus = value!),
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: selectedUrgency,
+                      decoration: const InputDecoration(labelText: 'Urgency'),
+                      items: ['low', 'medium', 'high'].map((urgency) {
+                        return DropdownMenuItem(value: urgency, child: Text(urgency.toUpperCase()));
+                      }).toList(),
+                      onChanged: (value) => setState(() => selectedUrgency = value!),
+                    ),
+                    const SizedBox(height: 10),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.calendar_today),
+                      title: Text(selectedDate == null
+                          ? 'Set Due Date'
+                          : 'Due: ${DateFormat.yMMMd().format(selectedDate!)}'),
+                      // trailing: selectedDate != null
+                      //     ? IconButton(
+                      //         icon: const Icon(Icons.clear),
+                      //         onPressed: () => setState(() => selectedDate = null),
+                      //       )
+                      //     : null,
+                      onTap: () async {
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2100),
+                        );
+                        if (pickedDate != null) {
+                          setState(() => selectedDate = pickedDate);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
                 ElevatedButton(
                   child: const Text('Save Changes'),
                   onPressed: () {
+                    // Panggil provider dengan logika yang jelas
                     Provider.of<TeamProvider>(context, listen: false).updateTodo(
-                      widget.teamId,
-                      todo.id,
-                      newStatus: selectedStatus,
-                      newUrgency: selectedUrgency,
+                      teamId: widget.teamId,
+                      todoId: todo.id,
+                      // Kirim HANYA jika nilainya berubah
+                      newStatus: todo.status != selectedStatus ? selectedStatus : null,
+                      newUrgency: todo.urgency != selectedUrgency ? selectedUrgency : null,
+                      // Logika tanggal yang jelas
+                      newDueDate: todo.dueDate != selectedDate && selectedDate != null ? selectedDate : null,
+                      clearDueDate: todo.dueDate != null && selectedDate == null,
                     );
                     Navigator.of(ctx).pop();
                   },
@@ -230,6 +304,7 @@ class _TodoScreenState extends State<TodoScreen> {
       },
     );
   }
+
 
   void _showInviteDialog(BuildContext context, int teamId) {
     final emailController = TextEditingController();

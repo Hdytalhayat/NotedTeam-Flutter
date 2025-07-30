@@ -60,46 +60,101 @@ class ApiService {
     }
   }
 
-  Future<Todo> createTodo(String token, int teamId, String title, String description, String urgency) async {
+  Future<Todo> createTodo(String token, int teamId, String title, String description, String urgency, DateTime? dueDate) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos');
+    
+    Map<String, dynamic> body = {
+      'title': title,
+      'description': description,
+      'urgency': urgency,
+    };
+
+    // HANYA tambahkan 'due_date' ke body jika tidak null.
+    // Ini mencegah pengiriman {"due_date": null} saat membuat todo baru.
+    if (dueDate != null) {
+      body['due_date'] = dueDate.toUtc().toIso8601String();
+    }
+
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({
-        'title': title,
-        'description': description,
-        'urgency': urgency,
-      }),
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      body: json.encode(body),
     );
 
-    if (response.statusCode == 201) {
-      return Todo.fromJson(json.decode(response.body)['data']);
-    } else {
+    if (response.statusCode != 201) {
+      print('Error Create Body: ${response.body}');
       throw Exception('Gagal membuat to-do');
     }
+    return Todo.fromJson(json.decode(response.body)['data']);
   }
 
-  Future<void> updateTodoStatus(String token, int teamId, int todoId, {String? newStatus, String? newUrgency}) async {
+  Future<void> updateTodo({
+    required String token,
+    required int teamId,
+    required int todoId,
+    String? newStatus,
+    String? newUrgency,
+    DateTime? newDueDate,
+    bool clearDueDate = false,
+  }) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos/$todoId');
-    Map<String, String> body = {};
+
+    Map<String, dynamic> body = {};
+
     if (newStatus != null) body['status'] = newStatus;
     if (newUrgency != null) body['urgency'] = newUrgency;
+
+    // Logika eksplisit untuk tanggal
+    if (clearDueDate) {
+      body['due_date'] = null; // Kirim null untuk menghapus
+    } else if (newDueDate != null) {
+      body['due_date'] = newDueDate.toUtc().toIso8601String(); // Kirim tanggal baru dalam format UTC
+    }
+
+    // Jika tidak ada perubahan, jangan lakukan apa-apa
+    if (body.isEmpty) return;
+
     final response = await http.put(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
       body: json.encode(body),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Gagal memperbarui status to-do');
+      print('Error Update Body: ${response.body}');
+      throw Exception('Gagal memperbarui to-do');
     }
   }
+
+
+  Future<void> updateTodoDynamic(String token, int teamId, int todoId, Map<String, dynamic> changes) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos/$todoId');
+    
+    // Buat map baru untuk body JSON
+    Map<String, dynamic> jsonBody = {};
+
+    // Salin field yang bukan tanggal
+    if (changes.containsKey('status')) jsonBody['status'] = changes['status'];
+    if (changes.containsKey('urgency')) jsonBody['urgency'] = changes['urgency'];
+
+    // Proses tanggal secara khusus
+    if (changes.containsKey('due_date_object')) {
+      final DateTime? date = changes['due_date_object'];
+      jsonBody['due_date'] = date?.toUtc().toIso8601String(); // Konversi ke UTC string atau null
+    }
+    
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      body: json.encode(jsonBody),
+    );
+
+    if (response.statusCode != 200) {
+      print('Error Body: ${response.body}');
+      throw Exception('Gagal memperbarui to-do');
+    }
+  }
+
 
   Future<void> deleteTodo(String token, int teamId, int todoId) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId/todos/$todoId');

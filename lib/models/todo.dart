@@ -6,6 +6,7 @@ class Todo {
   final String status;
   final String urgency;
   final int teamId;
+  final DateTime? dueDate;
 
   Todo({
     required this.id,
@@ -14,6 +15,7 @@ class Todo {
     required this.status,
     required this.urgency,
     required this.teamId,
+    this.dueDate, 
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class Todo {
       status: json['status'],
       urgency: json['urgency'],
       teamId: json['team_id'],
+      dueDate: json['due_date'] != null ? DateTime.parse(json['due_date']) : null,
     );
   }
 }

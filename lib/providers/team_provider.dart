@@ -74,27 +74,27 @@ class TeamProvider with ChangeNotifier {
   }
 
   Future<void> fetchAndSetTeams() async {
-  // TAMBAHKAN PRINT INI
-  print('Mencoba mengambil data tim...');
-  print('Token yang tersedia saat ini: $_authToken');
-
-  if (_authToken == null) {
-    print('Gagal: Token null. Fetch dibatalkan.');
-    return;
-  }
-  _isLoading = true;
-  notifyListeners();
-
-  try {
-    _teams = await _apiService.getMyTeams(_authToken!);
     // TAMBAHKAN PRINT INI
-    print('Berhasil: Ditemukan ${_teams.length} tim.');
-  } catch (error) {
-    print('Error saat mengambil tim: $error');
+    print('Mencoba mengambil data tim...');
+    print('Token yang tersedia saat ini: $_authToken');
+
+    if (_authToken == null) {
+      print('Gagal: Token null. Fetch dibatalkan.');
+      return;
+    }
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _teams = await _apiService.getMyTeams(_authToken!);
+      // TAMBAHKAN PRINT INI
+      print('Berhasil: Ditemukan ${_teams.length} tim.');
+    } catch (error) {
+      print('Error saat mengambil tim: $error');
+    }
+    _isLoading = false;
+    notifyListeners();
   }
-  _isLoading = false;
-  notifyListeners();
-}
 
 
   Future<void> fetchAndSetTodos(int teamId) async {
@@ -123,20 +123,38 @@ class TeamProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createTodo(int teamId, String title, String description, String urgency) async {
+// Perbaiki createTodo agar cocok dengan ApiService
+  Future<void> createTodo(
+      int teamId, String title, String description, String urgency, DateTime? dueDate) async {
     if (_authToken == null) return;
     try {
-      await _apiService.createTodo(_authToken!, teamId, title, description, urgency);
+      await _apiService.createTodo(_authToken!, teamId, title, description, urgency, dueDate);
     } catch (error) { rethrow; }
   }
 
-
-  Future<void> updateTodo(int teamId, int todoId, {String? newStatus, String? newUrgency}) async {
+  // Ganti updateTodoDynamic dengan updateTodo yang baru
+  Future<void> updateTodo({
+    required int teamId,
+    required int todoId,
+    String? newStatus,
+    String? newUrgency,
+    DateTime? newDueDate,
+    bool clearDueDate = false,
+  }) async {
     if (_authToken == null) return;
     try {
-      await _apiService.updateTodoStatus(_authToken!, teamId, todoId, newStatus: newStatus, newUrgency: newUrgency);
+      await _apiService.updateTodo(
+        token: _authToken!,
+        teamId: teamId,
+        todoId: todoId,
+        newStatus: newStatus,
+        newUrgency: newUrgency,
+        newDueDate: newDueDate,
+        clearDueDate: clearDueDate,
+      );
     } catch (error) { rethrow; }
   }
+
 
 
 
