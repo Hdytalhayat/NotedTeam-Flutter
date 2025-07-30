@@ -41,7 +41,10 @@ class _TodoScreenState extends State<TodoScreen> {
     });
     super.dispose();
   }
-
+  Future<void> _refreshTodos(BuildContext context) async {
+    await Provider.of<TeamProvider>(context, listen: false)
+        .fetchAndSetTodos(widget.teamId);
+  }
   @override
   Widget build(BuildContext context) {
     // Pindahkan provider call ke sini agar lebih mudah dibaca
@@ -63,40 +66,43 @@ class _TodoScreenState extends State<TodoScreen> {
       ),
       body: isLoading && todos.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: todos.length,
-              itemBuilder: (ctx, i) {
-                final todo = todos[i];
-                return Dismissible( // Widget untuk swipe-to-delete
-                  key: ValueKey(todo.id),
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
-                    margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    teamProvider.deleteTodo(widget.teamId, todo.id);
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                    child: ListTile(
-                      title: Text(todo.title),
-                      subtitle: Text(todo.description),
-                      trailing: Chip(
-                        label: Text(
-                          todo.status,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: todo.status == 'completed' ? Colors.green : Colors.orange,
-                      ),
-                      onTap: () => _showUpdateStatusDialog(context, todo),
+          : RefreshIndicator(
+              onRefresh: () => _refreshTodos(context),
+              child: ListView.builder(
+                itemCount: todos.length,
+                itemBuilder: (ctx, i) {
+                  final todo = todos[i];
+                  return Dismissible( // Widget untuk swipe-to-delete
+                    key: ValueKey(todo.id),
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                  ),
-                );
-              },
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      teamProvider.deleteTodo(widget.teamId, todo.id);
+                    },
+                    child: Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                      child: ListTile(
+                        title: Text(todo.title),
+                        subtitle: Text(todo.description),
+                        trailing: Chip(
+                          label: Text(
+                            todo.status,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: todo.status == 'completed' ? Colors.green : Colors.orange,
+                        ),
+                        onTap: () => _showUpdateStatusDialog(context, todo),
+                      ),
+                    ),
+                  );
+                },
+              )
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateTodoDialog(context),

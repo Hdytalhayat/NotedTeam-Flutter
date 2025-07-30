@@ -14,7 +14,7 @@ class WebSocketService {
     disconnect(); 
     
     // Ganti http dengan ws
-    final url = 'ws://192.168.1.2:8080/api/ws/teams/$teamId?token=$token';
+    final url = 'ws://192.168.1.3:8080/api/ws/teams/$teamId?token=$token';
     
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));

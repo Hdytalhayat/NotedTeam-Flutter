@@ -5,7 +5,7 @@ import '../models/team.dart';
 import '../models/todo.dart';
 
 class ApiService {
-  final String _baseUrl = 'http://192.168.1.2:8080';
+  final String _baseUrl = 'http://192.168.1.3:8080';
 
   Future<List<Team>> getMyTeams(String token) async {
     final url = Uri.parse('$_baseUrl/api/teams');
@@ -129,4 +129,32 @@ class ApiService {
       throw Exception('Gagal mengundang pengguna: ${errorData['error']}');
     }
   }
+  Future<void> updateTeamName(String token, int teamId, String newName) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'name': newName}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal memperbarui nama tim');
+    }
+  }
+
+  Future<void> deleteTeam(String token, int teamId) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId');
+    final response = await http.delete(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal menghapus tim');
+    }
+  }
+
 }

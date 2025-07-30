@@ -1,5 +1,6 @@
 // lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
+import 'package:notedteamfrontend/models/team.dart';
 import 'package:notedteamfrontend/screens/todo_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -21,7 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
       Provider.of<TeamProvider>(context, listen: false).fetchAndSetTeams();
     });
   }
-
+// Buat metode refresh agar kode lebih bersih
+  Future<void> _refreshTeams(BuildContext context) async {
+    // Cukup panggil metode fetch dari provider
+    await Provider.of<TeamProvider>(context, listen: false).fetchAndSetTeams();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,26 +50,34 @@ class _HomeScreenState extends State<HomeScreen> {
           if (teamProvider.teams.isEmpty) {
             return const Center(child: Text('Anda belum bergabung dengan tim manapun.'));
           }
-          return ListView.builder(
-            itemCount: teamProvider.teams.length,
-            itemBuilder: (ctx, i) {
-              final team = teamProvider.teams[i];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                child: ListTile(
-                  leading: const Icon(Icons.group),
-                  title: Text(team.name),
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (ctx) => TodoScreen(
-                        teamId: team.id,
-                        teamName: team.name,
-                      ),
-                    ));
-                  },
-                ),
-              );
-            },
+          return RefreshIndicator(
+            onRefresh: () => _refreshTeams(context),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: teamProvider.teams.length,
+              itemBuilder: (ctx, i) {
+                final team = teamProvider.teams[i];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                
+                  child: ListTile(
+                    leading: const Icon(Icons.group),
+                    title: Text(team.name),
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (ctx) => TodoScreen(
+                          teamId: team.id,
+                          teamName: team.name,
+                        ),
+                      ));
+                    },
+                    onLongPress: () { // Tambahkan onLongPress
+                      _showTeamOptionsDialog(context, team);
+                    },
+                  ),
+                );
+              },
+            )
           );
         },
       ),
@@ -99,6 +112,86 @@ class _HomeScreenState extends State<HomeScreen> {
                     .createTeam(teamNameController.text);
                 Navigator.of(ctx).pop();
               }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+// Tambahkan metode ini di dalam class _HomeScreenState
+  void _showTeamOptionsDialog(BuildContext context, Team team) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(team.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Rename Team'),
+              onTap: () {
+                Navigator.of(ctx).pop(); // Tutup dialog opsi
+                _showRenameTeamDialog(context, team);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Delete Team', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.of(ctx).pop(); // Tutup dialog opsi
+                _showDeleteConfirmDialog(context, team);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Tambahkan metode untuk rename
+  void _showRenameTeamDialog(BuildContext context, Team team) {
+    final teamNameController = TextEditingController(text: team.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rename Team'),
+        content: TextField(
+          controller: teamNameController,
+          decoration: const InputDecoration(labelText: 'New Team Name'),
+        ),
+        actions: [
+          TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
+          ElevatedButton(
+            child: const Text('Save'),
+            onPressed: () {
+              if (teamNameController.text.isNotEmpty) {
+                Provider.of<TeamProvider>(context, listen: false)
+                    .updateTeamName(team.id, teamNameController.text);
+                Navigator.of(ctx).pop();
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Tambahkan metode untuk konfirmasi delete
+  void _showDeleteConfirmDialog(BuildContext context, Team team) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Team'),
+        content: Text('Are you sure you want to permanently delete "${team.name}" and all of its todos? This action cannot be undone.'),
+        actions: [
+          TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(ctx).pop()),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('DELETE'),
+            onPressed: () {
+              Provider.of<TeamProvider>(context, listen: false).deleteTeam(team.id);
+              Navigator.of(ctx).pop();
             },
           ),
         ],

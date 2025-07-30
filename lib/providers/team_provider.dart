@@ -170,5 +170,35 @@ class TeamProvider with ChangeNotifier {
       rethrow;
     }
   }
+  Future<void> updateTeamName(int teamId, String newName) async {
+    if (_authToken == null) return;
+    try {
+      await _apiService.updateTeamName(_authToken!, teamId, newName);
+      // Perbarui state lokal
+      final teamIndex = _teams.indexWhere((team) => team.id == teamId);
+      if (teamIndex != -1) {
+        _teams[teamIndex] = Team(
+          id: teamId,
+          name: newName,
+          ownerId: _teams[teamIndex].ownerId, // Owner ID tidak berubah
+        );
+        notifyListeners();
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteTeam(int teamId) async {
+    if (_authToken == null) return;
+    try {
+      await _apiService.deleteTeam(_authToken!, teamId);
+      // Hapus dari state lokal
+      _teams.removeWhere((team) => team.id == teamId);
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
+  }
 
 }
