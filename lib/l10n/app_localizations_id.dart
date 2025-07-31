@@ -39,5 +39,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get noPendingInvitations => 'Tidak ada undangan tertunda.';
 
   @override
-  String get noTeamsJoined => 'Anda belum bergabung dengan tim manapun.';
+  String get noTeamsJoined => 'Masih sepi nih';
+
+  @override
+  String get createTeamToGetStarted => 'Bikin tim dulu, yuk!';
 }

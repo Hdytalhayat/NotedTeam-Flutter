@@ -9,5 +9,6 @@
     "system": "Sistem",
     "logout": "Keluar",
     "noPendingInvitations": "Tidak ada undangan tertunda.",
-    "noTeamsJoined": "Anda belum bergabung dengan tim manapun."
+    "noTeamsJoined": "Masih sepi nih",
+    "createTeamToGetStarted": "Bikin tim dulu, yuk!"
 }

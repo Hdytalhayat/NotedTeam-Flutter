@@ -25,7 +25,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
     final invitations = provider.invitations;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Invitations')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.myInvitations),),
       body: RefreshIndicator(
         onRefresh: () => provider.fetchMyInvitations(),
         child: invitations.isEmpty

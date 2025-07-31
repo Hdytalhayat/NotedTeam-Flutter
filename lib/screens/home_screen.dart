@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Teams'),
+        title: Text(AppLocalizations.of(context)!.myTeams),
         actions: [
           IconButton(
             icon: const Icon(Icons.mail_outline), // Ikon untuk undangan
@@ -69,8 +69,27 @@ class _HomeScreenState extends State<HomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (teamProvider.teams.isEmpty) {
-            return Center(child: Text(AppLocalizations.of(context)!.noTeamsJoined));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.folder_copy_outlined, size: 80, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.noTeamsJoined,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    AppLocalizations.of(context)!.createTeamToGetStarted,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
           }
+
           return RefreshIndicator(
             onRefresh: () => _refreshTeams(context),
             child: ListView.builder(

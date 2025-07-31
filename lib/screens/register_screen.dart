@@ -58,6 +58,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 40),
+              // --- TAMBAHKAN LOGO DI SINI ---
+              SizedBox(
+                height: 200,
+                child: Image.asset('assets/images/logo.png'),
+              ),
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Nama Lengkap'),

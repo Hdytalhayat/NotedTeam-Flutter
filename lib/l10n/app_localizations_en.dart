@@ -39,5 +39,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPendingInvitations => 'No pending invitations.';
 
   @override
-  String get noTeamsJoined => 'You have not joined any team yet.';
+  String get noTeamsJoined => 'It\'s Empty Here';
+
+  @override
+  String get createTeamToGetStarted => 'Create a team to get started.';
 }

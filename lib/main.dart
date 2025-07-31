@@ -9,6 +9,8 @@ import 'screens/splash_screen.dart';
 import '../l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; 
 import 'providers/settings_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -34,19 +36,37 @@ class MyApp extends StatelessWidget {
       
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {
+          const primaryColor = Color(0xFF6B7A8F);
+          const backgroundColor = Color(0xFFF8F5F1);
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
             title: 'NotedTeam',
-            // --- KONFIGURASI TEMA ---
             themeMode: settingsProvider.themeMode,
             theme: ThemeData(
               brightness: Brightness.light,
-              primarySwatch: Colors.blue,
+              primaryColor: primaryColor,
+              scaffoldBackgroundColor: backgroundColor,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: backgroundColor,
+                foregroundColor: Colors.black87,
+                elevation: 0.5,
+              ),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: primaryColor,
+                brightness: Brightness.light,
+                background: backgroundColor
+              ),
+              textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
             darkTheme: ThemeData(
               brightness: Brightness.dark,
-              primarySwatch: Colors.blue,
+              primaryColor: primaryColor,
+              scaffoldBackgroundColor: const Color(0xFF1a1a1a),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: primaryColor,
+                brightness: Brightness.dark,
+              ),
+              textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).primaryTextTheme),
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
 

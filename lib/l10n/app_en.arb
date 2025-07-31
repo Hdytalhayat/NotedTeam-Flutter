@@ -9,5 +9,6 @@
     "system": "System",
     "logout": "Logout",
     "noPendingInvitations": "No pending invitations.",
-    "noTeamsJoined": "You have not joined any team yet."
+    "noTeamsJoined": "It's Empty Here",
+    "createTeamToGetStarted": "Create a team to get started."
 }

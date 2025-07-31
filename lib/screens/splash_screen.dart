@@ -6,9 +6,14 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      // Gunakan warna latar yang sedikit off-white seperti logo
+      backgroundColor: const Color(0xFFF8F5F1), 
       body: Center(
-        child: CircularProgressIndicator(),
+        child: FractionallySizedBox(
+          widthFactor: 0.6, // Buat logo mengambil 60% lebar layar
+          child: Image.asset('assets/images/logo.png'),
+        ),
       ),
     );
   }

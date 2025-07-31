@@ -161,8 +161,14 @@ abstract class AppLocalizations {
   /// No description provided for @noTeamsJoined.
   ///
   /// In en, this message translates to:
-  /// **'You have not joined any team yet.'**
+  /// **'It\'s Empty Here'**
   String get noTeamsJoined;
+
+  /// No description provided for @createTeamToGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a team to get started.'**
+  String get createTeamToGetStarted;
 }
 
 class _AppLocalizationsDelegate
