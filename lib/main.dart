@@ -6,7 +6,9 @@ import 'providers/team_provider.dart'; // Impor provider baru
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
-
+import '../l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; 
+import 'providers/settings_provider.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -19,6 +21,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider( // Gunakan MultiProvider
       providers: [
         ChangeNotifierProvider(create: (ctx) => AuthProvider()),
+        ChangeNotifierProvider(create: (ctx) => SettingsProvider()), 
         ChangeNotifierProxyProvider<AuthProvider, TeamProvider>(
           create: (ctx) => TeamProvider(),
           update: (ctx, auth, previousTeamProvider) {
@@ -28,14 +31,44 @@ class MyApp extends StatelessWidget {
           },
         ),
       ],
-      child: MaterialApp(
-        title: 'NotedTeam',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const AuthWrapper(),
+      
+      child: Consumer<SettingsProvider>(
+        builder: (context, settingsProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'NotedTeam',
+            // --- KONFIGURASI TEMA ---
+            themeMode: settingsProvider.themeMode,
+            theme: ThemeData(
+              brightness: Brightness.light,
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+
+            // --- KONFIGURASI LOKALISASI ---
+            locale: settingsProvider.locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''), // English
+              Locale('id', ''), // Indonesian
+            ],
+
+            home: const AuthWrapper(),
+          );
+        },
       ),
+
+      
     );
   }
 }

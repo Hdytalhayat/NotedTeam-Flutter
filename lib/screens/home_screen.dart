@@ -1,12 +1,13 @@
 // lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:notedteamfrontend/models/team.dart';
+import 'package:notedteamfrontend/screens/settings_screen.dart';
 import 'package:notedteamfrontend/screens/todo_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/team_provider.dart';
 import 'invitations_screen.dart';
-
+import '../l10n/app_localizations.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -44,6 +45,16 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: 'My Invitations',
           ),
           IconButton(
+            icon: const Icon(Icons.settings), // Ikon untuk pengaturan
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => const SettingsScreen()),
+              );
+            },
+            tooltip: AppLocalizations.of(context)!.settings,
+          ),
+
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
               Provider.of<AuthProvider>(context, listen: false).logout();
@@ -58,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (teamProvider.teams.isEmpty) {
-            return const Center(child: Text('Anda belum bergabung dengan tim manapun.'));
+            return Center(child: Text(AppLocalizations.of(context)!.noTeamsJoined));
           }
           return RefreshIndicator(
             onRefresh: () => _refreshTeams(context),

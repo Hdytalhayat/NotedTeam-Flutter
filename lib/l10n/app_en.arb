@@ -1,0 +1,13 @@
+{
+    "myTeams": "My Teams",
+    "myInvitations": "My Invitations",
+    "settings": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "logout": "Logout",
+    "noPendingInvitations": "No pending invitations.",
+    "noTeamsJoined": "You have not joined any team yet."
+}

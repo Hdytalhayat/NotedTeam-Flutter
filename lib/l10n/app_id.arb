@@ -1,0 +1,13 @@
+{
+    "myTeams": "Tim Saya",
+    "myInvitations": "Undangan Saya",
+    "settings": "Pengaturan",
+    "language": "Bahasa",
+    "theme": "Tema",
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem",
+    "logout": "Keluar",
+    "noPendingInvitations": "Tidak ada undangan tertunda.",
+    "noTeamsJoined": "Anda belum bergabung dengan tim manapun."
+}

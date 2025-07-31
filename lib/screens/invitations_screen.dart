@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/team_provider.dart';
-
+import '../l10n/app_localizations.dart';
 class InvitationsScreen extends StatefulWidget {
   const InvitationsScreen({Key? key}) : super(key: key);
 
@@ -29,7 +29,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
       body: RefreshIndicator(
         onRefresh: () => provider.fetchMyInvitations(),
         child: invitations.isEmpty
-            ? const Center(child: Text('No pending invitations.'))
+            ? Center(child: Text(AppLocalizations.of(context)!.noPendingInvitations))
             : ListView.builder(
                 itemCount: invitations.length,
                 itemBuilder: (ctx, i) {
