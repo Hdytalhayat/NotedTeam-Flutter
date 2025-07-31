@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   // Ganti dengan IP yang sesuai jika perlu
-  final String _baseUrl = 'http://192.168.1.3:8080'; 
+  final String _baseUrl = 'http://192.168.1.2:8080'; 
 
   Future<void> register(String name, String email, String password) async {
     final url = Uri.parse('$_baseUrl/auth/register');

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
-
+import 'verify_email_screen.dart';
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
 
@@ -35,8 +35,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       // Setelah sukses daftar, arahkan ke login
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (ctx) => const LoginScreen()),
+        MaterialPageRoute(
+          builder: (ctx) => VerifyEmailScreen(email: _emailController.text),
+        ),
       );
+
     } catch (error) {
       _showErrorDialog(error.toString());
     } finally {
