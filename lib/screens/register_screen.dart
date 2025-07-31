@@ -52,49 +52,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register NotedTeam')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 40),
-              // --- TAMBAHKAN LOGO DI SINI ---
+      appBar: AppBar(title: const Text('Register')),
+      // 1. Ganti Padding dengan SingleChildScrollView
+      body: SingleChildScrollView(
+        // 2. Letakkan Padding di dalam SingleChildScrollView
+        child: Padding(
+          padding: const EdgeInsets.all(24.0), // Beri padding sedikit lebih besar
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.center, // Ini mungkin tidak lagi diperlukan
+            children: [
+              const SizedBox(height: 40),
               SizedBox(
                 height: 200,
                 child: Image.asset('assets/images/logo.png'),
               ),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nama Lengkap'),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              ElevatedButton(
-                onPressed: _submit,
-                child: const Text('Daftar'),
+              const Text(
+                'Create Your Account',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (ctx) => const LoginScreen()),
-                );
-              },
-              child: const Text('Sudah punya akun? Login'),
-            )
-          ],
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+              const SizedBox(height: 24),
+              if (_isLoading)
+                const CircularProgressIndicator()
+              else
+                // Bungkus dengan SizedBox agar tombolnya lebar
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text('Register'),
+                  ),
+                ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Already have an account? Login'),
+              )
+            ],
+          ),
         ),
       ),
     );
