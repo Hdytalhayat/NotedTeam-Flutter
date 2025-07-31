@@ -2,6 +2,7 @@
 import 'dart:async'; // Impor async
 import 'dart:convert'; // Impor convert
 import 'package:flutter/material.dart';
+import 'package:notedteamfrontend/models/invitation.dart';
 import '../api/api_service.dart';
 import '../api/websocket_service.dart';
 import '../models/team.dart';
@@ -27,6 +28,8 @@ class TeamProvider with ChangeNotifier {
   List<Todo> get currentTodos => _currentTodos;
   bool get isLoading => _isLoading;
 
+  List<Invitation> _invitations = [];
+  List<Invitation> get invitations => _invitations;
   // Metode untuk menerima token dari AuthProvider
   void updateAuthToken(String? token) {
     _authToken = token;
@@ -173,12 +176,12 @@ class TeamProvider with ChangeNotifier {
     disconnectFromTeamChannel();
     super.dispose();
   }
-  Future<void> inviteUserToTeam(int teamId, String email) async {
-    if (_authToken == null) return;
+  Future<String> inviteUserToTeam(int teamId, String email) async {
+    if (_authToken == null) throw Exception("Not authenticated");
     try {
-      await _apiService.inviteUserToTeam(_authToken!, teamId, email);
+      // Kembalikan string pesan sukses
+      return await _apiService.inviteUserToTeam(_authToken!, teamId, email);
     } catch (error) {
-      // Lemparkan lagi error agar UI bisa menangkap dan menampilkannya
       rethrow;
     }
   }
@@ -211,6 +214,33 @@ class TeamProvider with ChangeNotifier {
     } catch (error) {
       rethrow;
     }
+  }
+  Future<void> fetchMyInvitations() async {
+    if (_authToken == null) return;
+    try {
+      _invitations = await _apiService.getMyInvitations(_authToken!);
+      notifyListeners();
+    } catch (error) { rethrow; }
+  }
+
+  Future<void> acceptInvitation(int invitationId) async {
+    if (_authToken == null) return;
+    try {
+      await _apiService.respondToInvitation(_authToken!, invitationId, true);
+      // Hapus dari daftar lokal dan segarkan daftar tim
+      _invitations.removeWhere((inv) => inv.id == invitationId);
+      await fetchAndSetTeams(); // <-- Penting! Refresh daftar tim
+      notifyListeners();
+    } catch (error) { rethrow; }
+  }
+
+  Future<void> declineInvitation(int invitationId) async {
+    if (_authToken == null) return;
+    try {
+      await _apiService.respondToInvitation(_authToken!, invitationId, false);
+      _invitations.removeWhere((inv) => inv.id == invitationId);
+      notifyListeners();
+    } catch (error) { rethrow; }
   }
 
 }

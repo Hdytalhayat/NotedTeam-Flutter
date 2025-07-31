@@ -323,46 +323,45 @@ class _TodoScreenState extends State<TodoScreen> {
           TextButton(
             child: const Text('Cancel'),
             onPressed: () => Navigator.of(ctx).pop(),
-          ),
-          ElevatedButton(
-            child: const Text('Invite'),
-            onPressed: () async {
+                      ),
+                      ElevatedButton(
+                        child: const Text('Invite'),
+                        onPressed: () async {
               if (emailController.text.isEmpty) return;
 
-              // Tutup dialog
-              Navigator.of(ctx).pop();
+              final emailToInvite = emailController.text;
+              Navigator.of(ctx).pop(); // Tutup dialog sebelum proses
 
               try {
-                // Tampilkan snackbar loading
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Mengundang pengguna...')),
                 );
 
-                await teamProvider.inviteUserToTeam(
+                // Tangkap pesan sukses dari provider
+                final successMessage = await teamProvider.inviteUserToTeam(
                   teamId,
-                  emailController.text,
+                  emailToInvite,
                 );
                 
-                // Hapus snackbar loading dan tampilkan snackbar sukses
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Pengguna berhasil diundang!'),
+                  SnackBar(
+                    content: Text(successMessage), // Tampilkan pesan dari server
                     backgroundColor: Colors.green,
                   ),
                 );
 
               } catch (error) {
-                // Hapus snackbar loading dan tampilkan snackbar error
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(error.toString()),
+                    content: Text(error.toString().replaceFirst("Exception: ", "")), // Hapus prefix "Exception: "
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
+
           ),
         ],
       ),

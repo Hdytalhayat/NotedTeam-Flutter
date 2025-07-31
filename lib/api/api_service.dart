@@ -1,6 +1,7 @@
 // lib/api/api_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:notedteamfrontend/models/invitation.dart';
 import '../models/team.dart';
 import '../models/todo.dart';
 
@@ -171,23 +172,27 @@ class ApiService {
     }
   }
 
-  Future<void> inviteUserToTeam(String token, int teamId, String email) async {
+  Future<String> inviteUserToTeam(String token, int teamId, String email) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId/invite');
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
       body: json.encode({'email': email}),
     );
 
-    if (response.statusCode != 200) {
-      // Ambil pesan error spesifik dari backend
-      final errorData = json.decode(response.body);
-      throw Exception('Gagal mengundang pengguna: ${errorData['error']}');
+    final responseData = json.decode(response.body);
+
+    // Cek jika status code bukan 2xx (sukses)
+    if (response.statusCode >= 400) {
+      // Coba ambil pesan error, jika tidak ada, gunakan pesan default
+      String errorMessage = responseData['error'] ?? 'An unknown error occurred.';
+      throw Exception('Gagal mengundang pengguna: $errorMessage');
     }
+    
+    // Jika sukses (200 OK atau 201 Created), kembalikan pesan dari server
+    return responseData['message'];
   }
+
   Future<void> updateTeamName(String token, int teamId, String newName) async {
     final url = Uri.parse('$_baseUrl/api/teams/$teamId');
     final response = await http.put(
@@ -213,6 +218,30 @@ class ApiService {
 
     if (response.statusCode != 200) {
       throw Exception('Gagal menghapus tim');
+    }
+  }
+  Future<List<Invitation>> getMyInvitations(String token) async {
+    final url = Uri.parse('$_baseUrl/api/invitations');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'] as List;
+      return data.map((inv) => Invitation.fromJson(inv)).toList();
+    } else {
+      throw Exception('Gagal mengambil undangan');
+    }
+  }
+  Future<void> respondToInvitation(String token, int invitationId, bool accept) async {
+    final url = Uri.parse('$_baseUrl/api/invitations/$invitationId/respond');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      body: json.encode({'accept': accept}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Gagal merespons undangan');
     }
   }
 

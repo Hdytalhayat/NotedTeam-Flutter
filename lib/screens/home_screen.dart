@@ -5,6 +5,7 @@ import 'package:notedteamfrontend/screens/todo_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/team_provider.dart';
+import 'invitations_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -33,6 +34,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('My Teams'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.mail_outline), // Ikon untuk undangan
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => const InvitationsScreen()),
+              );
+            },
+            tooltip: 'My Invitations',
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
