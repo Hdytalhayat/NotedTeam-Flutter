@@ -34,11 +34,12 @@ class _TodoScreenState extends State<TodoScreen> {
   }
   @override
   void dispose() {
-    // 3. Putuskan koneksi WebSocket saat layar ditutup
-    // Ini sangat penting untuk mencegah memory leak!
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-       Provider.of<TeamProvider>(context, listen: false).disconnectFromTeamChannel();
-    });
+    // Panggil provider secara langsung. Tidak perlu menjadwalkannya.
+    // 'context' masih valid di dalam blok utama metode dispose.
+    final teamProvider = Provider.of<TeamProvider>(context, listen: false);
+    teamProvider.disconnectFromTeamChannel();
+
+    // Selalu panggil super.dispose() di paling akhir.
     super.dispose();
   }
   Future<void> _refreshTodos(BuildContext context) async {
