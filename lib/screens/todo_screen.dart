@@ -113,6 +113,14 @@ class _TodoScreenState extends State<TodoScreen> {
                                   ),
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  _buildAuditString(todo), // Gunakan helper untuk membuat string
+                                  style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.grey),
+                                ),
+                              ),
+
                           ],
                         ),
 
@@ -427,6 +435,14 @@ class _TodoScreenState extends State<TodoScreen> {
         ],
       ),
     );
+  }
+  String _buildAuditString(Todo todo) {
+    // Cek apakah to-do baru saja dibuat (creator sama dengan editor)
+    if (todo.creator.id == todo.editor.id) {
+      return 'Created by ${todo.creator.name}';
+    }
+    // Jika sudah pernah diedit
+    return 'Edited by ${todo.editor.name} (Created by ${todo.creator.name})';
   }
 
 }

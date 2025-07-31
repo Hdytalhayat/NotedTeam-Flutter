@@ -1,4 +1,6 @@
 // lib/models/todo.dart
+import 'package:notedteamfrontend/models/user.dart';
+
 class Todo {
   final int id;
   final String title;
@@ -7,6 +9,8 @@ class Todo {
   final String urgency;
   final int teamId;
   final DateTime? dueDate;
+  final User creator; // Ganti dari ID menjadi objek User
+  final User editor; // Tambahkan objek User
 
   Todo({
     required this.id,
@@ -16,6 +20,8 @@ class Todo {
     required this.urgency,
     required this.teamId,
     this.dueDate, 
+    required this.creator,
+    required this.editor,
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) {
@@ -27,6 +33,12 @@ class Todo {
       urgency: json['urgency'],
       teamId: json['team_id'],
       dueDate: json['due_date'] != null ? DateTime.parse(json['due_date']) : null,
-    );
+      creator: json['creator'] != null 
+        ? User.fromJson(json['creator']) 
+        : User(id: 0, name: 'Unknown', email: ''),
+      editor: json['editor'] != null 
+        ? User.fromJson(json['editor'])
+        : User(id: 0, name: 'Unknown', email: ''),
+      );
   }
 }
