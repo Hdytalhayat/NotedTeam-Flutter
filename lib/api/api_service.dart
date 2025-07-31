@@ -244,5 +244,18 @@ class ApiService {
       throw Exception('Gagal merespons undangan');
     }
   }
+  Future<Team> getTeamDetails(String token, int teamId) async {
+    final url = Uri.parse('$_baseUrl/api/teams/$teamId');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return Team.fromJson(json.decode(response.body)['data']);
+    } else {
+      throw Exception('Gagal mengambil detail tim');
+    }
+  }
 
 }

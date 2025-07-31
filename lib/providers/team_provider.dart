@@ -3,6 +3,7 @@ import 'dart:async'; // Impor async
 import 'dart:convert'; // Impor convert
 import 'package:flutter/material.dart';
 import 'package:notedteamfrontend/models/invitation.dart';
+import 'package:notedteamfrontend/models/user.dart';
 import '../api/api_service.dart';
 import '../api/websocket_service.dart';
 import '../models/team.dart';
@@ -30,6 +31,9 @@ class TeamProvider with ChangeNotifier {
 
   List<Invitation> _invitations = [];
   List<Invitation> get invitations => _invitations;
+
+  List<User> _currentTeamMembers = [];
+  List<User> get currentTeamMembers => _currentTeamMembers;
   // Metode untuk menerima token dari AuthProvider
   void updateAuthToken(String? token) {
     _authToken = token;
@@ -158,9 +162,6 @@ class TeamProvider with ChangeNotifier {
     } catch (error) { rethrow; }
   }
 
-
-
-
   Future<void> deleteTodo(int teamId, int todoId) async {
     if (_authToken == null) return;
     try {
@@ -242,5 +243,14 @@ class TeamProvider with ChangeNotifier {
       notifyListeners();
     } catch (error) { rethrow; }
   }
-
+  Future<void> fetchCurrentTeamDetails(int teamId) async {
+    if (_authToken == null) return;
+    try {
+      final teamDetails = await _apiService.getTeamDetails(_authToken!, teamId);
+      _currentTeamMembers = teamDetails.members;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+  }
 }

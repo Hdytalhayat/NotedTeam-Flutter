@@ -28,8 +28,7 @@ class _TodoScreenState extends State<TodoScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // 1. Ambil data awal melalui HTTP
       teamProvider.fetchAndSetTodos(widget.teamId);
-      
-      // 2. Buka koneksi WebSocket untuk real-time update
+      teamProvider.fetchCurrentTeamDetails(widget.teamId);
       teamProvider.connectToTeamChannel(widget.teamId);
     });
   }
@@ -57,6 +56,12 @@ class _TodoScreenState extends State<TodoScreen> {
       appBar: AppBar(
         title: Text(widget.teamName),
         actions: [ // Tambahkan actions
+          IconButton(
+            icon: const Icon(Icons.people_outline), // Ikon untuk member
+            onPressed: () => _showMembersDialog(context),
+            tooltip: 'Team Members',
+          ),
+
           IconButton(
             icon: const Icon(Icons.person_add),
             onPressed: () => _showInviteDialog(context, widget.teamId),
@@ -388,6 +393,40 @@ class _TodoScreenState extends State<TodoScreen> {
       default:
         return Colors.grey;
     }
+  }
+  void _showMembersDialog(BuildContext context) {
+    // Ambil daftar member dari provider (listen: true agar update jika ada perubahan nanti)
+    final members = Provider.of<TeamProvider>(context, listen: false).currentTeamMembers;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Team Members'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: members.isEmpty
+              ? const Text('No member data available.')
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: members.length,
+                  itemBuilder: (listCtx, i) {
+                    final member = members[i];
+                    return ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text(member.name),
+                      subtitle: Text(member.email),
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+        ],
+      ),
+    );
   }
 
 }
