@@ -1,130 +1,130 @@
 # NotedTeam - Mobile Apps (Flutter)
 
-![NotedTeam Logo](assets/images/LOGO-BG.png)
+<img src="assets/images/LOGO-BG.png" alt="NotedTeam Logo" width="160"/>
 
-Ini adalah repositori untuk aplikasi mobile **NotedTeam**, sebuah to-do list kolaboratif yang dibangun menggunakan **Flutter**. Aplikasi ini berfungsi sebagai antarmuka (frontend) untuk [NotedTeam Go Backend](https://github.com/Hdytalhayat/NotedTeamBackend).
+This is the mobile application repository for **NotedTeam**, a collaborative to-do list app built using **Flutter**. It serves as the frontend interface for the [NotedTeam Go Backend](https://github.com/Hdytalhayat/NotedTeamBackend).
 
-Aplikasi ini dirancang untuk memberikan pengalaman pengguna yang mulus, responsif, dan real-time di platform Android.
+Designed to provide a smooth, responsive, and real-time experience on Android devices.
 
-[**Kunjungi Landing Page »**]([Link ke Landing Page Anda Di Sini])
+[**Visit Landing Page »**]([Link to Your Landing Page Here])
 
 ---
 
-## 📱 Fitur Aplikasi
+## 📱 App Features
 
--   **Antarmuka Bersih & Modern**: UI yang dirancang dengan baik, lengkap dengan mode Terang & Gelap.
--   **Alur Otentikasi Lengkap**:
-    -   Registrasi Pengguna dengan Verifikasi Email.
-    -   Login Aman dengan JWT.
-    -   Fungsionalitas Lupa & Reset Password.
-    -   Sesi persisten (Auto-Login).
--   **Manajemen Tim Kolaboratif**:
-    -   Membuat, mengubah nama, dan menghapus tim (hanya oleh pemilik).
-    -   Mengundang anggota baru melalui email.
-    -   Menerima atau menolak undangan tim.
-    -   Melihat daftar anggota dalam sebuah tim.
--   **Manajemen Tugas Interaktif**:
-    -   CRUD (Create, Read, Update, Delete) penuh untuk to-do list.
-    -   Geser-untuk-hapus (Swipe-to-delete).
-    -   Pengaturan Status, Urgensi, dan Tanggal Jatuh Tempo (Timeline).
--   **Sinkronisasi Real-time**: Didukung oleh **WebSocket**, semua perubahan pada to-do list langsung diperbarui di semua perangkat anggota tim yang online.
--   **Internasionalisasi (i18n)**: Dukungan untuk dua bahasa: Inggris dan Indonesia.
--   **Pengaturan Persisten**: Pengguna dapat menyimpan preferensi tema dan bahasa mereka di perangkat.
+- **Clean & Modern Interface**: Beautiful UI with full support for Light & Dark modes.
+- **Complete Authentication Flow**:
+  - User Registration with Email Verification.
+  - Secure Login using JWT.
+  - Forgot & Reset Password functionality.
+  - Persistent sessions (Auto-login).
+- **Collaborative Team Management**:
+  - Create, rename, and delete teams (owner only).
+  - Invite members via email.
+  - Accept or decline team invitations.
+  - View team members.
+- **Interactive Task Management**:
+  - Full CRUD support for to-do items.
+  - Swipe-to-delete functionality.
+  - Status, Urgency, and Due Date settings.
+- **Real-Time Synchronization**: Powered by **WebSocket**, all to-do list updates are instantly pushed to all online team members.
+- **Internationalization (i18n)**: Support for English and Indonesian languages.
+- **Persistent Settings**: Users can store their preferred theme and language locally.
 
-## 🛠️ Teknologi & Arsitektur
+## 🛠️ Tech Stack & Architecture
 
--   **Framework**: **Flutter 3.x**
--   **Bahasa**: **Dart**
--   **Manajemen State**: **Provider** - Pola yang diadopsi secara luas untuk manajemen state yang reaktif dan sederhana. Arsitektur menggunakan `ChangeNotifierProvider` dan `ChangeNotifierProxyProvider` untuk dependensi antar state.
--   **Networking**:
-    -   `http`: Untuk komunikasi dengan RESTful API backend.
-    -   `web_socket_channel`: Untuk koneksi real-time dengan server WebSocket.
--   **Penyimpanan Lokal**: `shared_preferences` untuk menyimpan token otentikasi JWT dan pengaturan pengguna.
--   **Navigasi**: Menggunakan `Navigator` bawaan Flutter dengan `MaterialPageRoute` dan `pushAndRemoveUntil` untuk alur otentikasi yang solid.
--   **Lokalisasi**: `flutter_localizations` dan `intl` dengan file `.arb` untuk manajemen terjemahan.
--   **Ketergantungan UI Tambahan**:
-    -   `google_fonts`: Untuk tipografi yang konsisten dan menarik.
-    -   `flutter_staggered_animations`: Untuk memberikan animasi daftar yang halus.
+- **Framework**: **Flutter 3.x**
+- **Language**: **Dart**
+- **State Management**: **Provider** – Widely adopted reactive state management pattern using `ChangeNotifierProvider` and `ChangeNotifierProxyProvider` for dependencies.
+- **Networking**:
+  - `http`: For RESTful API communication with the backend.
+  - `web_socket_channel`: For real-time WebSocket connections.
+- **Local Storage**: `shared_preferences` to persist JWT tokens and user settings.
+- **Navigation**: Uses Flutter's built-in `Navigator` with `MaterialPageRoute` and `pushAndRemoveUntil` for solid auth flows.
+- **Localization**: `flutter_localizations` and `intl` with `.arb` files for managing translations.
+- **Additional UI Dependencies**:
+  - `google_fonts`: For consistent and attractive typography.
+  - `flutter_staggered_animations`: For smooth list animations.
 
-## 📂 Struktur Proyek
+## 📂 Project Structure
 
-Proyek ini disusun dengan arsitektur berlapis untuk keterbacaan dan skalabilitas:
+The project follows a layered architecture for readability and scalability:
 
 ```
+
 lib/
-├── api/          # Lapisan komunikasi dengan backend (Services)
-│   ├── api_service.dart
-│   ├── auth_service.dart
-│   └── websocket_service.dart
-├── l10n/         # File terjemahan (internasionalisasi)
-│   ├── app_en.arb
-│   └── app_id.arb
-├── models/       # Kelas model data (merepresentasikan data dari JSON)
+├── api/          # Backend communication layer (Services)
+│   ├── api\_service.dart
+│   ├── auth\_service.dart
+│   └── websocket\_service.dart
+├── l10n/         # Translation files (i18n)
+│   ├── app\_en.arb
+│   └── app\_id.arb
+├── models/       # Data models representing JSON structures
 │   ├── invitation.dart
 │   ├── team.dart
 │   ├── todo.dart
 │   └── user.dart
-├── providers/    # Lapisan logika bisnis dan state management
-│   ├── auth_provider.dart
-│   ├── settings_provider.dart
-│   └── team_provider.dart
-├── screens/      # Widget untuk setiap halaman/layar
-│   ├── home_screen.dart
-│   ├── invitations_screen.dart
-│   ├── login_screen.dart
-│   ├── register_screen.dart
-│   ├── settings_screen.dart
-│   └── todo_screen.dart
-└── main.dart     # Titik masuk utama aplikasi, mengatur provider dan tema
-```
+├── providers/    # Business logic and state management
+│   ├── auth\_provider.dart
+│   ├── settings\_provider.dart
+│   └── team\_provider.dart
+├── screens/      # UI pages/screens
+│   ├── home\_screen.dart
+│   ├── invitations\_screen.dart
+│   ├── login\_screen.dart
+│   ├── register\_screen.dart
+│   ├── settings\_screen.dart
+│   └── todo\_screen.dart
+└── main.dart     # Main entry point, sets up providers and theming
 
-## 🚀 Memulai (Getting Started)
+````
 
-### Prasyarat
+## 🚀 Getting Started
 
--   Pastikan Anda telah menginstal **Flutter SDK** (versi 3.0 atau lebih baru).
--   **Backend NotedTeam harus berjalan**. Lihat [dokumentasi backend]([Link ke Repositori Backend Anda Di Sini]) untuk instruksi menjalankannya.
+### Prerequisites
 
-### Instalasi & Menjalankan
+- Install **Flutter SDK** (version 3.0 or later).
+- **NotedTeam Backend must be running**. See [backend documentation]([Link to Your Backend Repository Here]) for instructions.
 
-1.  **Clone repositori ini:**
+### Installation & Running
+
+1. **Clone this repository:**
     ```bash
-    git clone [Link ke Repositori Frontend Anda Di Sini]
+    git clone [Your Frontend Repository Link Here]
     cd notedteam_app
     ```
 
-2.  **Instal semua dependensi:**
+2. **Install all dependencies:**
     ```bash
     flutter pub get
     ```
 
-3.  **Konfigurasi URL Backend:**
-    - Buka file `lib/api/api_service.dart`.
-    - Temukan variabel `_baseUrl`.
-    - Ubah nilainya agar sesuai dengan alamat server backend Anda:
-        - Untuk emulator Android: `'http://10.0.2.2:8080'`
-        - Untuk emulator iOS: `'http://localhost:8080'`
-        - Untuk perangkat fisik (di jaringan yang sama): `'http://[IP_LOKAL_KOMPUTER_ANDA]:8080'`
-    - Lakukan hal yang sama untuk URL WebSocket di `lib/api/websocket_service.dart`.
+3. **Configure Backend URL:**
+    - Open `lib/api/api_service.dart`
+    - Locate the `_baseUrl` variable.
+    - Set it according to your backend address:
+        - For Android emulator: `'http://10.0.2.2:8080'`
+        - For iOS simulator: `'http://localhost:8080'`
+        - For physical devices (on the same network): `'http://[YOUR_LOCAL_IP]:8080'`
+    - Do the same for WebSocket URL in `lib/api/websocket_service.dart`.
 
-4.  **Jalankan aplikasi (Mode Debug):**
+4. **Run the app (Debug mode):**
     ```bash
     flutter run
     ```
 
-## 📦 Membangun untuk Rilis (Build)
+## 📦 Building for Release
 
-Aplikasi ini sudah dikonfigurasi untuk membuat **Android App Bundle (AAB)** untuk rilis ke Google Play Store.
+The app is set up to build an **Android App Bundle (AAB)** for publishing on the Google Play Store.
 
-1.  **Siapkan Keystore Penandatanganan**: Ikuti panduan resmi Flutter untuk [membuat upload keystore](https://docs.flutter.dev/deployment/android#create-an-upload-keystore).
-2.  **Konfigurasi `key.properties`**: Buat file `android/key.properties` dan isi dengan kredensial keystore Anda. Pastikan file ini ada di `.gitignore`.
-3.  **Perbarui Versi**: Tingkatkan `versionCode` dan `versionName` di `android/app/build.gradle`.
-4.  **Jalankan Perintah Build**:
+1. **Generate Signing Keystore**: Follow Flutter's official guide for [creating an upload keystore](https://docs.flutter.dev/deployment/android#create-an-upload-keystore).
+2. **Configure `key.properties`**: Create a file at `android/key.properties` and add your keystore credentials. Make sure it’s listed in `.gitignore`.
+3. **Update Versioning**: Increment `versionCode` and `versionName` in `android/app/build.gradle`.
+4. **Build the AAB**:
     ```bash
     flutter build appbundle
     ```
-    File rilis akan dibuat di `build/app/outputs/bundle/release/app-release.aab`.
+    The release file will be located at: `build/app/outputs/bundle/release/app-release.aab`.
 
 ---
-
-Dibuat dengan ❤️ menggunakan Flutter dan Go.
