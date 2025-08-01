@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   // Ganti dengan IP yang sesuai jika perlu
-  final String _baseUrl = 'http://noble-energy-production-d0ae.up.railway.app'; 
+  final String _baseUrl = 'https://noble-energy-production-d0ae.up.railway.app'; 
 
   Future<void> register(String name, String email, String password) async {
     final url = Uri.parse('$_baseUrl/auth/register');

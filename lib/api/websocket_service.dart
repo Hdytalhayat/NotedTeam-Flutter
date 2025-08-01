@@ -14,7 +14,7 @@ class WebSocketService {
     disconnect(); 
     
     // Ganti http dengan ws
-    final url = 'ws://noble-energy-production-d0ae.up.railway.app/api/ws/teams/$teamId?token=$token';
+    final url = 'wss://noble-energy-production-d0ae.up.railway.app/api/ws/teams/$teamId?token=$token';
     
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));

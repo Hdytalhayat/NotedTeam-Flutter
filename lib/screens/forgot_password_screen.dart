@@ -22,7 +22,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.1.2:8080/auth/forgot-password');
+      final url = Uri.parse('https://noble-energy-production-d0ae.up.railway.app/auth/forgot-password');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
