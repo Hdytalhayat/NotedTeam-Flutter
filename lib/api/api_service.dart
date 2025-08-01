@@ -6,7 +6,7 @@ import '../models/team.dart';
 import '../models/todo.dart';
 
 class ApiService {
-  final String _baseUrl = 'http://192.168.1.2:8080';
+  final String _baseUrl = 'https://noble-energy-production-d0ae.up.railway.app';
 
   Future<List<Team>> getMyTeams(String token) async {
     final url = Uri.parse('$_baseUrl/api/teams');
