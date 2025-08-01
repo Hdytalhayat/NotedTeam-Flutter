@@ -1,6 +1,6 @@
 # NotedTeam - Mobile Apps (Flutter)
 
-![NotedTeam Logo](assets/logo.png)
+![NotedTeam Logo](assets/images/logo.png)
 
 Ini adalah repositori untuk aplikasi mobile **NotedTeam**, sebuah to-do list kolaboratif yang dibangun menggunakan **Flutter**. Aplikasi ini berfungsi sebagai antarmuka (frontend) untuk [NotedTeam Go Backend]([Link ke Repositori Backend Anda Di Sini]).
 
