@@ -6,7 +6,7 @@ This is the mobile application repository for **NotedTeam**, a collaborative to-
 
 Designed to provide a smooth, responsive, and real-time experience on Android devices.
 
-[**Visit Landing Page »**]([Link to Your Landing Page Here])
+[**Visit Landing Page »**](https://github.com/Hdytalhayat/NotedTeam)
 
 ---
 
