@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
           const primaryColor = Color(0xFF6B7A8F);
           const backgroundColor = Color(0xFFF8F5F1);
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'NotedTeam',
             themeMode: settingsProvider.themeMode,
             theme: ThemeData(
