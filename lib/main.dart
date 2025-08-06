@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
       
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {
-          const primaryColor = Color(0xFF6B7A8F);
-          const backgroundColor = Color(0xFFF8F5F1);
+          const primaryColor = Color(0xFFB300);
+          const backgroundColor = Color(0x164058);
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'NotedTeam',
