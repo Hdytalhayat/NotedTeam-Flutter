@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../widgets/responsive_layout.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -47,29 +48,40 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Forgot Password')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Enter your email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 20),
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              ElevatedButton(
-                onPressed: _submit,
-                child: const Text('Send Reset Link'),
+      body: Center(
+        child: SingleChildScrollView(
+          child: ResponsiveLayout(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(labelText: 'Enter your email'),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 20),
+                  if (_isLoading)
+                    const CircularProgressIndicator()
+                  else
+                    ElevatedButton(
+                      onPressed: _submit,
+                      child: const Text('Send Reset Link'),
+                    ),
+                  const SizedBox(height: 20),
+                  if (_message.isNotEmpty)
+                    Text(
+                      _message,
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+                ],
               ),
-            const SizedBox(height: 20),
-            if (_message.isNotEmpty)
-              Text(_message, style: TextStyle(color: Theme.of(context).primaryColor)),
-          ],
+            ),
+          ),
         ),
       ),
+
     );
   }
 }

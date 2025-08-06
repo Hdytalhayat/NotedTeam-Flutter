@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'verify_email_screen.dart';
+import '../widgets/responsive_layout.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
 
@@ -55,60 +57,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(title: const Text('Register')),
       // 1. Ganti Padding dengan SingleChildScrollView
       body: SingleChildScrollView(
-        // 2. Letakkan Padding di dalam SingleChildScrollView
-        child: Padding(
-          padding: const EdgeInsets.all(24.0), // Beri padding sedikit lebih besar
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center, // Ini mungkin tidak lagi diperlukan
-            children: [
-              const SizedBox(height: 40),
-              SizedBox(
-                height: 200,
-                child: Image.asset('assets/images/logo.png'),
-              ),
-              const Text(
-                'Create Your Account',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              const SizedBox(height: 24),
-              if (_isLoading)
-                const CircularProgressIndicator()
-              else
-                // Bungkus dengan SizedBox agar tombolnya lebar
+        child: ResponsiveLayout(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
                 SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _submit,
-                    child: const Text('Register'),
-                  ),
+                  height: 200,
+                  child: Image.asset('assets/images/logo.png'),
                 ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Already have an account? Login'),
-              )
-            ],
+                const Text(
+                  'Create Your Account',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 24),
+                if (_isLoading)
+                  const CircularProgressIndicator()
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _submit,
+                      child: const Text('Register'),
+                    ),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Already have an account? Login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
+
     );
   }
 }

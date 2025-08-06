@@ -5,6 +5,7 @@ import 'package:notedteamfrontend/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
+import '../widgets/responsive_layout.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -83,57 +84,59 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Login NotedTeam')),
       body: SingleChildScrollView(
-        child: Padding(
-
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              // --- TAMBAHKAN LOGO DI SINI ---
-              SizedBox(
-                height: 200,
-                child: Image.asset('assets/images/logo.png'),
-              ),
-
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              if (_isLoading)
-                const CircularProgressIndicator()
-              else
-                ElevatedButton(
-                  onPressed: _submit,
-                  child: const Text('Login'),
+        child: ResponsiveLayout(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                // --- LOGO ---
+                SizedBox(
+                  height: 200,
+                  child: Image.asset('assets/images/logo.png'),
                 ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => const RegisterScreen()),
-                  );
-                },
-                child: const Text('Belum punya akun? Daftar'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => const ForgotPasswordScreen()),
-                  );
-                },
-                child: const Text('Forgot Password?'),
-              )
-            ],
+
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 20),
+                if (_isLoading)
+                  const CircularProgressIndicator()
+                else
+                  ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text('Login'),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const RegisterScreen()),
+                    );
+                  },
+                  child: const Text('Belum punya akun? Daftar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const ForgotPasswordScreen()),
+                    );
+                  },
+                  child: const Text('Forgot Password?'),
+                )
+              ],
+            ),
           ),
-        )
+        ),
       ),
+
     );
   }
 }

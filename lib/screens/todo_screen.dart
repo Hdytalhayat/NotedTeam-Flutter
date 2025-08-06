@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/todo.dart';
 import '../providers/team_provider.dart';
 import 'package:intl/intl.dart';
+import '../widgets/responsive_layout.dart';
 
 class TodoScreen extends StatefulWidget {
   final int teamId;
@@ -71,79 +72,85 @@ class _TodoScreenState extends State<TodoScreen> {
         ],
 
       ),
-      body: isLoading && todos.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: () => _refreshTodos(context),
-              child: ListView.builder(
-                itemCount: todos.length,
-                itemBuilder: (ctx, i) {
-                  final todo = todos[i];
-                  return Dismissible( // Widget untuk swipe-to-delete
-                    key: ValueKey(todo.id),
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      teamProvider.deleteTodo(widget.teamId, todo.id);
-                    },
-                    child: Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                      child: ListTile(
-                        leading: _getUrgencyIcon(todo.urgency),
-                        title: Text(todo.title),
-                        subtitle: Column( // Bungkus dengan Column
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(todo.description),
-                            if (todo.dueDate != null) // Tampilkan hanya jika ada
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  'Due: ${DateFormat.yMMMd().format(todo.dueDate!)}', // Format tanggal
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: todo.dueDate!.isBefore(DateTime.now()) && todo.status != 'completed' 
-                                        ? Colors.red 
-                                        : Colors.grey[600],
+      body: ResponsiveLayout(
+        child: isLoading && todos.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: () => _refreshTodos(context),
+                child: ListView.builder(
+                  itemCount: todos.length,
+                  itemBuilder: (ctx, i) {
+                    final todo = todos[i];
+                    return Dismissible(
+                      key: ValueKey(todo.id),
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (direction) {
+                        teamProvider.deleteTodo(widget.teamId, todo.id);
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                        child: ListTile(
+                          leading: _getUrgencyIcon(todo.urgency),
+                          title: Text(todo.title),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(todo.description),
+                              if (todo.dueDate != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    'Due: ${DateFormat.yMMMd().format(todo.dueDate!)}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: todo.dueDate!.isBefore(DateTime.now()) &&
+                                              todo.status != 'completed'
+                                          ? Colors.red
+                                          : Colors.grey[600],
+                                    ),
                                   ),
                                 ),
-                              ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 6.0),
                                 child: Text(
-                                  _buildAuditString(todo), // Gunakan helper untuk membuat string
-                                  style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.grey),
+                                  _buildAuditString(todo),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
-
-                          ],
-                        ),
-
-                        trailing: Chip(
-                          label: Text(
-                            todo.status,
-                            style: const TextStyle(color: Colors.white),
+                            ],
                           ),
-                          backgroundColor: _getStatusColor(todo.status),
+                          trailing: Chip(
+                            label: Text(
+                              todo.status,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: _getStatusColor(todo.status),
+                          ),
+                          onTap: () => _showEditTodoDialog(context, todo),
                         ),
-                        onTap: () => _showEditTodoDialog(context, todo),
                       ),
-                    ),
-                  );
-                },
-              )
-            ),
+                    );
+                  },
+                ),
+              ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateTodoDialog(context),
         child: const Icon(Icons.add),
         tooltip: 'Add To-do',
       ),
+
     );
   }
   // Tambahkan metode ini di dalam class _TodoScreenState

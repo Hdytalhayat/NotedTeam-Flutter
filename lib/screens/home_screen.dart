@@ -8,6 +8,7 @@ import '../providers/auth_provider.dart';
 import '../providers/team_provider.dart';
 import 'invitations_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/responsive_layout.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -62,7 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-      body: Consumer<TeamProvider>(
+      body: ResponsiveLayout( 
+
+        child: Consumer<TeamProvider>(
         
         builder: (ctx, teamProvider, child) {
           if (teamProvider.isLoading && teamProvider.teams.isEmpty) {
@@ -120,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           );
         },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateTeamDialog(context),
