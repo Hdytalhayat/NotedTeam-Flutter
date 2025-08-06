@@ -1,6 +1,6 @@
 # NotedTeam - Mobile Apps (Flutter)
 
-<img src="assets/images/LOGO-BG.png" alt="NotedTeam Logo" width="160"/>
+<img src="assets/images/logo.png" alt="NotedTeam Logo" width="160"/>
 
 This is the mobile application repository for **NotedTeam**, a collaborative to-do list app built using **Flutter**. It serves as the frontend interface for the [NotedTeam Go Backend](https://github.com/Hdytalhayat/NotedTeamBackend).
 
